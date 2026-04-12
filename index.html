@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тхэквондо: PRO Программа 6-5 КУП</title>
+    <style>
+        :root {
+            --purple: #9b59b6;
+            --blue: #3498db;
+            --dark: #2c3e50;
+            --bg: #f4f7f6;
+            --green: #27ae60;
+        }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        
+        .header { position: sticky; top: 0; background: var(--bg); width: 100%; padding: 10px 0; text-align: center; z-index: 1000; border-bottom: 1px solid #ddd; }
+        .btn-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .btn { padding: 10px 18px; border-radius: 25px; border: 1px solid #ccc; cursor: pointer; font-weight: bold; background: white; transition: 0.3s; }
+        .btn.active { background: var(--dark); color: white; border-color: var(--dark); }
+        .btn-purple.active { background: var(--purple); border-color: var(--purple); }
+        .btn-blue.active { background: var(--blue); border-color: var(--blue); }
+
+        #app { width: 100%; max-width: 600px; margin-top: 20px; }
+        .section-title { background: #eee; padding: 10px; margin: 20px 0 10px; border-radius: 8px; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; color: #555; }
+        
+        /* Карточки */
+        .card { background: white; padding: 18px; margin-bottom: 12px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid #ccc; transition: 0.2s; }
+        .cup-tag { font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
+        .task-text { font-size: 1.05rem; color: var(--dark); line-height: 1.4; }
+        .theory-ans { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; color: var(--green); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
+
+        /* Рандом */
+        .random-box { background: white; min-height: 320px; border-radius: 25px; display: flex; flex-direction: column; justify-content: center; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); cursor: pointer; margin-bottom: 20px; border: 2px solid #eee; }
+        .btn-next { background: var(--green); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="btn-group" id="belts">
+        <button class="btn btn-purple active" onclick="setBelt(6)">6 КУП</button>
+        <button class="btn btn-blue active" onclick="setBelt(5)">5 КУП</button>
+    </div>
+    <div class="btn-group" id="modes">
+        <button class="btn active" onclick="setMode('list', this)">Список</button>
+        <button class="btn" onclick="setMode('rand-all', this)">Рандом (Всё)</button>
+        <button class="btn" onclick="setMode('rand-theory', this)">Теория</button>
+    </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+const db = [
+    // 6 КУП (Пурпурный) - РАЗБИТО ПО ОДНОМУ ПУНКТУ
+    {cup:6, cat:"Удары", t:"На месте (без постановки ноги на пол): Ап Чаги – Дольо Чаги"},
+    {cup:6, cat:"Удары", t:"На месте (без постановки ноги на пол): Ап Чаги – Ёп Чаги"},
+    {cup:6, cat:"Удары", t:"В движении: Нэрё Чаги – Дольо Чаги"},
+    {cup:6, cat:"Удары", t:"В движении: Ёп Чаги – Двит Чаги"},
+    {cup:6, cat:"Удары", t:"Баккат Дольо Чаги (Хурио Чаги)"},
+    {cup:6, cat:"Удары", t:"Дюбон Ап Чаги (Монтон, Ольгуль)"},
+    {cup:6, cat:"Удары", t:"На отходе: Дольо Чаги (с передней через Двит Коа Соги)"},
+    {cup:6, cat:"Удары", t:"На отходе: Дольо Чаги (с задней)"},
+    {cup:6, cat:"Удары", t:"Без постановки ноги на пол: Ап Чаги – Дольо Чаги"},
+    {cup:6, cat:"Удары", t:"Без постановки ноги на пол: Ап Чаги – Ёп Чаги"},
+    {cup:6, cat:"Техника рук", t:"В Ап Куби: Монтон Сонкут Чируги"},
+    {cup:6, cat:"Техника рук", t:"В Ап Куби: Дун Джумок Апе Чиги"},
+    {cup:6, cat:"Техника рук", t:"В Ап Куби: Джеби Пум Сонналь Мок Чиги"},
+    {cup:6, cat:"Степ", t:"Скользящий вперёд, уход без смены стоек"},
+    {cup:6, cat:"Степ", t:"Скользящий вперед уход со сменой стоек"},
+    {cup:6, cat:"Пумсэ", t:"Тэгук Сам Джан + терминология"},
+    {cup:6, cat:"Защита", t:"Блоки от удара Дольо Чаги (Арэ, Монтон, Ольгуль Макки)"},
+    {cup:6, cat:"Физподготовка", t:"Отжимания: 20 раз; Пресс: 30 раз; Стойка на одной руке: 2 мин"},
+    {cup:6, cat:"Теория", q:"Что означают цвета украинского флага?", a:"Синий цвет означает небо, желтый пшеничное поле, символизируя стремление народа Украины к миру и труду."},
+    {cup:6, cat:"Теория", q:"Какой кодекс чести учеников на продвинутой стадии?", a:"1) Уважать друг друга.\n2) Быть честным.\n3) Быть терпеливым к окружающим.\n4) Помогать друг другу.\n5) Защищать слабого.\n6) Быть верным самому себе, своей семье.\n7) Следовать указаниям мастера (учителя) и верить ему.\n8) Быть верным своему залу."},
+    {cup:6, cat:"Теория", q:"Что необходимо помнить, работая в паре?", a:"1) Уйти с линии атаки либо опередить противника контратакой.\n2) Не подставлять противнику спину – это не безопасно, такое поведение не соответствует принципам ТХЭКВОНДО.\n3) Не напрягаться, быть расслабленным физически, но не ослаблять внимание - это может привести к травме или поражению."},
+    {cup:6, cat:"Теория", q:"Что означает зеленый и пурпурный цвет пояса?", a:"Эти цвета пояса означают весну, начало роста и возможностей."},
+    {cup:6, cat:"Теория", q:"Что означает Тэгук-сам-джан?", a:"Знак Тэгук-сам-джан — пламя. Он символизирует стремление направить на плодотворную стезю глубоко сокрытый в каждом из нас огонь. Пумсэ, соответственно символу, очень подвижно и разнообразно."},
+
+    // 5 КУП (Голубой) - РАЗБИТО ПО ОДНОМУ ПУНКТУ
+    {cup:5, cat:"Удары", t:"На месте (без постановки): Ёп Чаги"},
+    {cup:5, cat:"Удары", t:"На месте (без постановки): Дольо Чаги"},
+    {cup:5, cat:"Удары", t:"На месте (без постановки): Баккат Дольо Чаги"},
+    {cup:5, cat:"Удары", t:"В движении: Нэрё Чаги – Двит Чаги"},
+    {cup:5, cat:"Удары", t:"В движении: Дольо Чаги – Двит Чаги"},
+    {cup:5, cat:"Удары", t:"В движении: Торнадо – Дольо Чаги"},
+    {cup:5, cat:"Удары", t:"Двит Дольо Чаги"},
+    {cup:5, cat:"Удары", t:"На скачке: Ап Чаги, Нерьо Чаги"},
+    {cup:5, cat:"Удары", t:"На скачке: Дюбон Бандель Чаги"},
+    {cup:5, cat:"Удары", t:"На отходе: Двит Чаги"},
+    {cup:5, cat:"Удары", t:"На отходе: Двит Дольо Чаги"},
+    {cup:5, cat:"Удары", t:"На отходе: Торнадо"},
+    {cup:5, cat:"Удары", t:"Без постановки ноги: Ёп Чаги – Дольо Чаги"},
+    {cup:5, cat:"Удары", t:"Без постановки ноги: Баккат Дольо Чаги – Дольо Чаги"},
+    {cup:5, cat:"Степ", t:"Смена стойки, скользящий вперед, уход без смены стоек"},
+    {cup:5, cat:"Степ", t:"Оборотный вперёд, скользящий назад, уход со сменой"},
+    {cup:5, cat:"Пумсэ", t:"Тэгук Са Джан + терминология"},
+    {cup:5, cat:"Спарринг", t:"Условный спарринг от Дольо и Нерьо Чаги: уход с блоком + контр атака (Бандель, Ёп, Двит, Торнадо)"},
+    {cup:5, cat:"Физподготовка", t:"Отжимания: 25 раз; Пресс: 35 раз; Стойка на одной руке: 2 мин"},
+    {cup:5, cat:"Теория", q:"Кто имеет право стать участником соревнований?", a:"1) Любой, имеющий национальность ту же, что и выступающая команда.\n2) Любой, рекомендованный национальной федерацией ТХЭКВОНДО.\n3) Любой, имеющий диплом обладателя дана по ТХЭКВОНДО, выданного в Кукивоне (WTF)."},
+    {cup:5, cat:"Теория", q:"Какие требования предъявляются к костюмам участников?", a:"Костюм ТХЭКВОНДО (добок), состоящий из брюк и куртки белого цвета и пояса, должен отвечать требованиям:\nа) рукава должны доходить до запястья и полностью закрывать накладки;\nб) длина куртки должна полностью закрывать пах;\nв) штанины должны доходить до голеностопного сустава и закрывать накладки. Участники проводят поединок босиком."},
+    {cup:5, cat:"Теория", q:"Назовите все восемь пумсэ ученических поясов.", a:"1) Тэгук-иль-джан, 2) Тэгук-и-джан, 3) Тэгук-сам-джан, 4) Тэгук-са-джан, 5) Тэгук-о-джан, 6) Тэгук-юк-джан, 7) Тэгук-чиль-джан, 8) Тэгук-паль-джан."},
+    {cup:5, cat:"Теория", q:"Что означает символ Тэгук-са-джан?", a:"Тэгук-са-джан символизирует гром. В нем преобладают мощные, ритмичные движения. Пумсэ выражает спокойствие и мужество перед лицом опасности и требует при выполнении внутреннего и внешнего равновесия."}
+];
+
+let selectedBelts = [6, 5];
+let currentMode = 'list';
+let randPool = [];
+
+function setBelt(c) {
+    if(selectedBelts.includes(c)) { if(selectedBelts.length > 1) selectedBelts = selectedBelts.filter(x => x !== c); }
+    else selectedBelts.push(c);
+    updateUI();
+}
+
+function setMode(m, btn) {
+    currentMode = m;
+    document.querySelectorAll('#modes .btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+}
+
+function updateUI() {
+    const btns = document.querySelectorAll('#belts .btn');
+    btns[0].classList.toggle('active', selectedBelts.includes(6));
+    btns[1].classList.toggle('active', selectedBelts.includes(5));
+    render();
+}
+
+function render() {
+    const app = document.getElementById('app');
+    app.innerHTML = '';
+    let filtered = db.filter(x => selectedBelts.includes(x.cup));
+
+    if(currentMode === 'list') {
+        const cats = ["Удары", "Техника рук", "Степ", "Пумсэ", "Защита", "Спарринг", "Теория", "Физподготовка"];
+        cats.forEach(cat => {
+            const items = filtered.filter(f => f.cat === cat);
+            if(items.length) {
+                app.innerHTML += `<div class="section-title">${cat}</div>`;
+                items.forEach(i => {
+                    const color = i.cup === 6 ? 'var(--purple)' : 'var(--blue)';
+                    app.innerHTML += `
+                        <div class="card" style="border-left-color: ${color}">
+                            <div class="cup-tag" style="color: ${color}">${i.cup} КУП</div>
+                            <div class="task-text">${i.q || i.t}</div>
+                            ${i.a ? `<div class="theory-ans"><b>ОТВЕТ:</b>\n${i.a}</div>` : ''}
+                        </div>`;
+                });
+            }
+        });
+    } else {
+        if(currentMode === 'rand-theory') filtered = filtered.filter(x => x.cat === 'Теория');
+        if(!randPool.length) randPool = [...filtered].sort(() => Math.random() - 0.5);
+        
+        const item = randPool[randPool.length - 1];
+        const color = item.cup === 6 ? 'var(--purple)' : 'var(--blue)';
+        
+        app.innerHTML = `
+            <div class="random-box" onclick="document.getElementById('ans').classList.toggle('hidden')">
+                <div class="cup-tag" style="color: ${color}; font-size: 1rem">${item.cup} КУП | ${item.cat}</div>
+                <div class="task-text" style="font-size: 1.4rem; font-weight: bold; margin: 20px 0;">${item.q || item.t}</div>
+                <div id="ans" class="theory-ans hidden" style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee;">${item.a || "Это практическое задание (без текста)"}</div>
+                ${item.a ? '<div style="margin-top:20px; color: #888; font-size: 0.8rem">Нажми, чтобы увидеть полный ответ</div>' : ''}
+            </div>
+            <button class="btn-next" onclick="randPool.pop(); render()">СЛЕДУЮЩЕЕ (Осталось: ${randPool.length - 1})</button>
+        `;
+    }
+}
+
+render();
+</script>
+</body>
+</html>
