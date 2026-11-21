@@ -1,176 +1,2907 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тхэквондо: PRO Программа 6-5 КУП</title>
-    <style>
-        :root {
-            --purple: #9b59b6;
-            --blue: #3498db;
-            --dark: #2c3e50;
-            --bg: #f4f7f6;
-            --green: #27ae60;
-        }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
-        
-        .header { position: sticky; top: 0; background: var(--bg); width: 100%; padding: 10px 0; text-align: center; z-index: 1000; border-bottom: 1px solid #ddd; }
-        .btn-group { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-        .btn { padding: 10px 18px; border-radius: 25px; border: 1px solid #ccc; cursor: pointer; font-weight: bold; background: white; transition: 0.3s; }
-        .btn.active { background: var(--dark); color: white; border-color: var(--dark); }
-        .btn-purple.active { background: var(--purple); border-color: var(--purple); }
-        .btn-blue.active { background: var(--blue); border-color: var(--blue); }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Тхэквондо 4-куп (Синий пояс) — Тренажёр аттестации</title>
+  <style>
+    /* =========================================================================
+       1. БАЗОВЫЕ ПЕРЕМЕННЫЕ И СБРОС СТИЛЕЙ (100% АВТОНОМНЫЙ CSS)
+       ========================================================================= */
+    :root {
+      --bg-main: #090d16;
+      --bg-card: #111827;
+      --bg-card-elevated: #182236;
+      --bg-input: #0b111e;
+      --border-subtle: rgba(148, 163, 184, 0.16);
+      --border-accent: rgba(56, 189, 248, 0.4);
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --belt-blue: #2563eb;
+      --belt-blue-hover: #1d4ed8;
+      --belt-cyan: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --shadow-card: 0 20px 45px -15px rgba(0, 0, 0, 0.65);
+    }
 
-        #app { width: 100%; max-width: 600px; margin-top: 20px; }
-        .section-title { background: #eee; padding: 10px; margin: 20px 0 10px; border-radius: 8px; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; color: #555; }
-        
-        /* Карточки */
-        .card { background: white; padding: 18px; margin-bottom: 12px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 6px solid #ccc; transition: 0.2s; }
-        .cup-tag { font-size: 0.75rem; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; }
-        .task-text { font-size: 1.05rem; color: var(--dark); line-height: 1.4; }
-        .theory-ans { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd; color: var(--green); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-        /* Рандом */
-        .random-box { background: white; min-height: 320px; border-radius: 25px; display: flex; flex-direction: column; justify-content: center; padding: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); cursor: pointer; margin-bottom: 20px; border: 2px solid #eee; }
-        .btn-next { background: var(--green); color: white; border: none; padding: 18px; border-radius: 15px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); }
-        .hidden { display: none; }
-    </style>
+    html, body {
+      min-height: 100vh;
+      background-color: var(--bg-main);
+      background-image:
+        radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.18), transparent 42%),
+        radial-gradient(circle at 85% 15%, rgba(56, 189, 248, 0.12), transparent 38%);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, input {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* =========================================================================
+       2. ШАПКА ПРИЛОЖЕНИЯ
+       ========================================================================= */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: rgba(9, 13, 22, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .belt-stripe {
+      height: 4px;
+      width: 100%;
+      background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 45%, #38bdf8 75%, #2563eb 100%);
+    }
+
+    .header-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .brand-title span {
+      color: var(--belt-cyan);
+    }
+
+    .belt-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.22);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #7dd3fc;
+      white-space: nowrap;
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    @media (min-width: 640px) {
+      .brand-title { font-size: 1.2rem; }
+      .brand-sub { display: block; }
+      .header-inner { padding: 14px 24px; }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--belt-cyan);
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .btn-icon:hover {
+      background: #22304a;
+    }
+
+    .btn-icon.muted {
+      color: var(--text-muted);
+    }
+
+    .btn-timer-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-radius: 11px;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.38);
+      color: #fcd34d;
+      font-size: 0.85rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .btn-timer-header:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-mobile-filters {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 13px;
+      border-radius: 11px;
+      background: var(--belt-blue);
+      color: #ffffff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn-mobile-filters .count-badge {
+      background: rgba(255, 255, 255, 0.22);
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+    }
+
+    @media (min-width: 960px) {
+      .btn-mobile-filters {
+        display: none;
+      }
+    }
+
+    /* =========================================================================
+       3. ОСНОВНАЯ СЕТКА СТРАНИЦЫ
+       ========================================================================= */
+    .main-container {
+      flex: 1;
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 18px 16px 36px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (min-width: 960px) {
+      .main-container {
+        padding: 28px 24px 48px;
+        grid-template-columns: 360px 1fr;
+        gap: 28px;
+      }
+    }
+
+    /* =========================================================================
+       4. БОКОВАЯ ПАНЕЛЬ ФИЛЬТРОВ (ДЕСКТОП + МОБИЛЬНЫЙ DRAWER)
+       ========================================================================= */
+    .drawer-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(4px);
+      z-index: 40;
+    }
+
+    .drawer-backdrop.open {
+      display: block;
+    }
+
+    .sidebar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+    }
+
+    @media (max-width: 959px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(92vw, 390px);
+        z-index: 50;
+        border-radius: 22px 0 0 22px;
+        overflow-y: auto;
+        transform: translateX(105%);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+    }
+
+    @media (min-width: 960px) {
+      .sidebar {
+        position: sticky;
+        top: 86px;
+      }
+      .mobile-drawer-header,
+      .mobile-drawer-footer {
+        display: none !important;
+      }
+    }
+
+    .mobile-drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .sidebar-title {
+      font-size: 1rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .preset-chip {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 8px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      transition: all 0.15s ease;
+    }
+
+    .preset-chip:hover {
+      border-color: var(--belt-cyan);
+      color: #ffffff;
+    }
+
+    .sidebar-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      line-height: 1.45;
+    }
+
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(24, 34, 54, 0.55);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.16s ease;
+    }
+
+    .cat-item.active {
+      background: rgba(37, 99, 235, 0.14);
+      border-color: rgba(56, 189, 248, 0.42);
+    }
+
+    .cat-item:not(.active) {
+      opacity: 0.58;
+    }
+
+    .cat-item:hover {
+      opacity: 1;
+      border-color: rgba(56, 189, 248, 0.55);
+    }
+
+    .cat-checkbox {
+      width: 19px;
+      height: 19px;
+      border-radius: 6px;
+      border: 2px solid #475569;
+      background: var(--bg-input);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+      transition: all 0.15s ease;
+    }
+
+    .cat-item.active .cat-checkbox {
+      background: var(--belt-blue);
+      border-color: var(--belt-cyan);
+    }
+
+    .cat-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cat-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .cat-name {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .cat-count {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--bg-input);
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .cat-desc {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+
+    .deck-mode-box {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #334155;
+      border-radius: 999px;
+      transition: 0.2s;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      transition: 0.2s;
+    }
+
+    .switch input:checked + .slider {
+      background-color: var(--belt-blue);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    .mobile-drawer-footer {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-apply-mobile {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #2563eb, #0284c7);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+
+    /* =========================================================================
+       5. РАБОЧАЯ ЗОНА КАРТОЧЕК (ПРАВАЯ КОЛОНКА)
+       ========================================================================= */
+    .stage {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .status-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 11px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .status-stats {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .status-stats strong {
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .status-divider {
+      color: #334155;
+    }
+
+    .btn-reshuffle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 9px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+
+    .btn-reshuffle:hover {
+      color: #ffffff;
+      border-color: var(--belt-cyan);
+    }
+
+    /* Главная карточка */
+    .flashcard {
+      background: linear-gradient(180deg, #131c2e 0%, #0f1625 100%);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 24px;
+      padding: 22px 20px;
+      min-height: 360px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    @media (min-width: 640px) {
+      .flashcard {
+        padding: 32px 34px;
+        min-height: 410px;
+      }
+    }
+
+    .flashcard::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, #1d4ed8, #38bdf8, #2563eb);
+    }
+
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-in {
+      animation: fadeSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(37, 99, 235, 0.2);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #7dd3fc;
+    }
+
+    .category-badge.fitness {
+      background: rgba(245, 158, 11, 0.16);
+      border-color: rgba(245, 158, 11, 0.38);
+      color: #fcd34d;
+    }
+
+    .category-badge.theory {
+      background: rgba(168, 85, 247, 0.18);
+      border-color: rgba(192, 132, 252, 0.38);
+      color: #e9d5ff;
+    }
+
+    .category-badge.poomsae {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: rgba(52, 211, 153, 0.38);
+      color: #6ee7b7;
+    }
+
+    .ticket-tag {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .card-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      line-height: 1.45;
+    }
+
+    .card-question {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.3;
+      letter-spacing: -0.015em;
+    }
+
+    @media (min-width: 640px) {
+      .card-question {
+        font-size: 1.85rem;
+      }
+    }
+
+    /* Блок ответа */
+    .answer-panel {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-subtle);
+      display: none;
+    }
+
+    .answer-panel.visible {
+      display: block;
+      animation: fadeSlideUp 0.25s ease forwards;
+    }
+
+    .answer-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--belt-cyan);
+      margin-bottom: 10px;
+    }
+
+    .answer-body {
+      background: rgba(9, 13, 22, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.22);
+      border-radius: 14px;
+      padding: 15px 18px;
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+
+    /* Кнопки управления карточкой */
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .card-actions {
+        grid-template-columns: 1fr 1.35fr;
+      }
+    }
+
+    .btn-answer {
+      padding: 15px 20px;
+      border-radius: 15px;
+      background: var(--bg-card-elevated);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      color: #ffffff;
+      font-size: 0.98rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-answer:hover:not(:disabled) {
+      background: #22304a;
+      border-color: var(--belt-cyan);
+    }
+
+    .btn-answer:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-next {
+      padding: 15px 22px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+      color: #ffffff;
+      font-size: 1.02rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.48);
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+
+    .btn-next:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-next:active, .btn-answer:active {
+      transform: scale(0.98);
+    }
+
+    .kbd-hints {
+      display: none;
+      justify-content: center;
+      gap: 22px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      padding-top: 2px;
+    }
+
+    @media (min-width: 960px) {
+      .kbd-hints {
+        display: flex;
+      }
+    }
+
+    kbd {
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 2px 7px;
+      font-size: 0.74rem;
+      color: var(--text-primary);
+    }
+
+    /* =========================================================================
+       6. ТАЙМЕР ФИЗПОДГОТОВКИ И КАЛЬКУЛЯТОР ТЕМПА (ПРЕСС / ОТЖИМАНИЯ)
+       ========================================================================= */
+    .workout-box {
+      margin-top: 20px;
+      background: rgba(9, 13, 22, 0.92);
+      border: 1px solid rgba(245, 158, 11, 0.32);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .duration-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .dur-tab {
+      padding: 6px 12px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .dur-tab.active {
+      background: var(--belt-blue);
+      border-color: var(--belt-cyan);
+      color: #ffffff;
+    }
+
+    .timer-phase-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      background: var(--bg-card-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .timer-phase-badge.prep {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: rgba(245, 158, 11, 0.5);
+      color: #fcd34d;
+    }
+
+    .timer-phase-badge.work {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.5);
+      color: #6ee7b7;
+    }
+
+    .timer-phase-badge.done {
+      background: rgba(37, 99, 235, 0.25);
+      border-color: rgba(56, 189, 248, 0.5);
+      color: #7dd3fc;
+    }
+
+    .timer-digits {
+      font-size: 3.4rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      margin: 8px 0;
+      color: #ffffff;
+      line-height: 1.05;
+    }
+
+    @media (min-width: 640px) {
+      .timer-digits {
+        font-size: 4.1rem;
+      }
+    }
+
+    .timer-digits.prep { color: #fbbf24; }
+    .timer-digits.work { color: #34d399; }
+    .timer-digits.urgent { color: #fb7185; }
+    .timer-digits.done { color: #38bdf8; }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 14px 0 16px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--belt-cyan);
+      transition: width 0.4s linear;
+    }
+
+    .progress-fill.prep { background: #f59e0b; }
+    .progress-fill.work { background: #10b981; }
+    .progress-fill.urgent { background: #f43f5e; }
+
+    .timer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-timer-start {
+      padding: 13px 24px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #090d16;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-timer-secondary {
+      padding: 11px 16px;
+      border-radius: 12px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 0.86rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-timer-finish-early {
+      padding: 11px 16px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.42);
+      color: #6ee7b7;
+      font-weight: 700;
+      font-size: 0.86rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Калькулятор повторений и темпа после таймера */
+    .pace-calc-box {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(148, 163, 184, 0.25);
+      text-align: left;
+      animation: fadeSlideUp 0.25s ease forwards;
+    }
+
+    .pace-calc-title {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #fcd34d;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .pace-calc-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .rep-stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .step-btn {
+      padding: 10px 13px;
+      border-radius: 10px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.88rem;
+      min-width: 44px;
+    }
+
+    .step-btn:hover {
+      border-color: var(--belt-cyan);
+    }
+
+    .rep-input {
+      width: 92px;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 11px;
+      background: var(--bg-card);
+      border: 2px solid var(--belt-blue);
+      color: #ffffff;
+      font-size: 1.35rem;
+      font-weight: 900;
+      outline: none;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 540px) {
+      .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .stat-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 11px 12px;
+    }
+
+    .stat-tile.highlight {
+      background: rgba(37, 99, 235, 0.16);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .stat-value {
+      font-size: 1.08rem;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .stat-note {
+      font-size: 0.72rem;
+      color: #7dd3fc;
+      margin-top: 2px;
+    }
+
+    .norm-verdict {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    .norm-verdict.ok {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7;
+    }
+
+    .norm-verdict.warn {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+
+    /* =========================================================================
+       7. МОДАЛЬНОЕ ОКНО БЫСТРОГО ТАЙМЕРА ОФП
+       ========================================================================= */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(3, 7, 18, 0.84);
+      backdrop-filter: blur(6px);
+      padding: 16px;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 490px;
+      padding: 22px;
+      position: relative;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.75);
+      animation: fadeSlideUp 0.25s ease forwards;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: #ffffff;
+      border-color: var(--belt-cyan);
+    }
+
+    .exercise-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 14px 0 4px;
+    }
+
+    .ex-btn {
+      padding: 10px 8px;
+      border-radius: 12px;
+      background: var(--bg-card-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .ex-btn.active {
+      background: rgba(37, 99, 235, 0.24);
+      border-color: var(--belt-cyan);
+      color: #ffffff;
+    }
+
+    .ex-btn span {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .ex-btn.active span {
+      color: #7dd3fc;
+    }
+
+    /* Пустое состояние */
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      margin: auto 0;
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin: 12px 0 8px;
+    }
+
+    .empty-state p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      max-width: 380px;
+      margin: 0 auto 20px;
+    }
+
+    /* =========================================================================
+       8. ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ И СПИСОК ВСЕХ ЗАДАНИЙ
+       ========================================================================= */
+    .mode-switcher {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 6px;
+      box-shadow: 0 10px 25px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    .mode-tab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 11px;
+      font-size: 0.86rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      .mode-tab {
+        font-size: 0.92rem;
+        padding: 12px 18px;
+      }
+    }
+
+    .mode-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .mode-tab.active {
+      background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+      color: #ffffff;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .hidden-view {
+      display: none !important;
+    }
+
+    /* Панель управления списком заданий */
+    .list-toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 720px) {
+      .list-toolbar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 13px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 36px 10px 38px;
+      border-radius: 11px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--belt-cyan);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .search-clear.visible {
+      display: flex;
+    }
+
+    .list-toolbar-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .list-count-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .list-count-label strong {
+      color: var(--belt-cyan);
+    }
+
+    .btn-toggle-all {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border-radius: 11px;
+      background: var(--bg-card-elevated);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #7dd3fc;
+      font-size: 0.82rem;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .btn-toggle-all:hover {
+      background: rgba(37, 99, 235, 0.22);
+      color: #ffffff;
+    }
+
+    /* Группы разделов в списке */
+    .catalog-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .catalog-group {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 12px 30px -15px rgba(0, 0, 0, 0.55);
+    }
+
+    @media (min-width: 640px) {
+      .catalog-group {
+        padding: 22px;
+      }
+    }
+
+    .catalog-group-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .catalog-group-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+
+    .catalog-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .catalog-item {
+      background: rgba(11, 17, 30, 0.72);
+      border: 1px solid var(--border-subtle);
+      border-radius: 15px;
+      padding: 15px 16px;
+      transition: border-color 0.15s ease;
+    }
+
+    .catalog-item:hover {
+      border-color: rgba(56, 189, 248, 0.32);
+    }
+
+    .catalog-item-top {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 640px) {
+      .catalog-item-top {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+    }
+
+    .catalog-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .catalog-item-question {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    @media (min-width: 640px) {
+      .catalog-item-question {
+        font-size: 1.04rem;
+      }
+    }
+
+    .catalog-item-actions {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-item-answer {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 10px;
+      background: var(--bg-card-elevated);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .btn-item-answer:hover,
+    .btn-item-answer.open {
+      background: rgba(37, 99, 235, 0.22);
+      border-color: var(--belt-cyan);
+      color: #ffffff;
+    }
+
+    .btn-item-timer {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fcd34d;
+      font-size: 0.8rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+    }
+
+    .btn-item-timer:hover {
+      background: rgba(245, 158, 11, 0.28);
+    }
+
+    .catalog-item-answer {
+      display: none;
+      margin-top: 12px;
+      padding: 13px 15px;
+      border-radius: 12px;
+      background: rgba(17, 24, 39, 0.92);
+      border-left: 3px solid var(--belt-cyan);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .catalog-item-answer.visible {
+      display: block;
+      animation: fadeSlideUp 0.2s ease forwards;
+    }
+
+    /* Футер */
+    .footer {
+      border-top: 1px solid var(--border-subtle);
+      padding: 16px;
+      text-align: center;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+  </style>
 </head>
 <body>
 
-<div class="header">
-    <div class="btn-group" id="belts">
-        <button class="btn btn-purple active" onclick="setBelt(6)">6 КУП</button>
-        <button class="btn btn-blue active" onclick="setBelt(5)">5 КУП</button>
+  <!-- Верхняя панель -->
+  <header class="header">
+    <div class="belt-stripe"></div>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true">
+          <!-- Иконка пояса / медали (SVG) -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="6"></circle>
+            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title-row">
+            <h1 class="brand-title">ТХЭКВОНДО <span>4-КУП</span></h1>
+            <span class="belt-pill">Синий пояс</span>
+          </div>
+          <p class="brand-sub">Случайные карточки экзамена, фильтрация разделов и таймер ОФП</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Звук -->
+        <button id="soundBtn" class="btn-icon" onclick="toggleSound()" title="Звуковые сигналы таймера" aria-label="Переключить звук">
+          <svg id="soundSvg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+        </button>
+
+        <!-- Кнопка Таймера ОФП -->
+        <button class="btn-timer-header" onclick="openQuickTimerModal()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="13" r="8"></circle>
+            <path d="M12 9v4l2 2"></path>
+            <path d="M5 3 2 6"></path>
+            <path d="m22 6-3-3"></path>
+            <path d="M10 2h4"></path>
+          </svg>
+          <span>Таймер ОФП</span>
+        </button>
+
+        <!-- Кнопка открытия фильтров на телефоне -->
+        <button class="btn-mobile-filters" onclick="openMobileDrawer()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+          <span>Разделы</span>
+          <span id="mobileCountBadge" class="count-badge">7/7</span>
+        </button>
+      </div>
     </div>
-    <div class="btn-group" id="modes">
-        <button class="btn active" onclick="setMode('list', this)">Список</button>
-        <button class="btn" onclick="setMode('rand-all', this)">Рандом (Всё)</button>
-        <button class="btn" onclick="setMode('rand-theory', this)">Теория</button>
+  </header>
+
+  <!-- Затемнение фона для мобильного меню фильтров -->
+  <div id="drawerBackdrop" class="drawer-backdrop" onclick="closeMobileDrawer()"></div>
+    <!-- Правая колонка: Тренажёр карточек и Список всех заданий -->
+    <section class="stage">
+      <!-- Переключатель режимов -->
+      <div class="mode-switcher" role="tablist" aria-label="Режим подготовки">
+        <button id="tabCardsBtn" class="mode-tab active" role="tab" aria-selected="true" onclick="switchViewMode('cards')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="16" height="16" rx="3"></rect>
+            <path d="M6 2h14a2 2 0 0 1 2 2v14"></path>
+          </svg>
+          <span>Карточки (Рандом)</span>
+        </button>
+
+        <button id="tabListBtn" class="mode-tab" role="tab" aria-selected="false" onclick="switchViewMode('list')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          <span>Список всех заданий и ответов</span>
+        </button>
+      </div>
+
+      <!-- РЕЖИМ 1: СЛУЧАЙНЫЕ КАРТОЧКИ -->
+      <div id="cardsView" style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- Панель прогресса -->
+        <div class="status-bar">
+          <div class="status-stats">
+            <span>Карточка: <strong id="progressText">1 / 24</strong></span>
+            <span class="status-divider">|</span>
+            <span>Разделов: <strong id="activeCatsText" style="color: #38bdf8;">7 из 7</strong></span>
+          </div>
+
+          <button class="btn-reshuffle" onclick="resetDeck()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            <span>Перемешать</span>
+          </button>
+        </div>
+
+        <!-- Карточка с вопросом/заданием -->
+        <article class="flashcard">
+          <div id="cardBody" class="animate-in"></div>
+        </article>
+
+        <!-- Нижние кнопки действий -->
+        <div class="card-actions">
+          <button id="toggleAnswerBtn" class="btn-answer" onclick="toggleAnswer()">
+            <svg id="answerEyeSvg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <span id="answerBtnLabel">Показать ответ</span>
+          </button>
+
+          <button class="btn-next" onclick="drawNextCard()">
+            <span>Следующий вопрос</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Горячие клавиши для ПК -->
+        <div class="kbd-hints">
+          <span><kbd>Пробел</kbd> — Показать / скрыть ответ</span>
+          <span><kbd>→</kbd> или <kbd>Enter</kbd> — Следующая карточка</span>
+        </div>
+      </div>
+
+      <!-- РЕЖИМ 2: СПИСОК ВСЕХ ЗАДАНИЙ И ОТВЕТОВ -->
+      <div id="listView" class="hidden-view" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="list-toolbar">
+          <div class="search-box">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="catalogSearchInput" class="search-input" type="text" placeholder="Поиск по ударам, вопросам, ответам..." oninput="onCatalogSearch(this.value)" />
+            <button id="searchClearBtn" class="search-clear" onclick="clearCatalogSearch()" aria-label="Очистить поиск">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="list-toolbar-actions">
+            <span class="list-count-label">Показано: <strong id="catalogCountLabel">24</strong></span>
+            <button id="toggleAllAnswersBtn" class="btn-toggle-all" onclick="toggleAllCatalogAnswers()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span id="toggleAllAnswersLabel">Показать все ответы</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="catalogContainer" class="catalog-sections"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Модальное окно быстрого таймера ОФП -->
+  <div id="quickTimerModal" class="modal-overlay" onclick="handleModalBackdropClick(event)">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeQuickTimerModal()" aria-label="Закрыть таймер">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div style="font-size: 0.74rem; font-weight: 800; color: #fcd34d; text-transform: uppercase; letter-spacing: 0.05em;">
+        Тестирование ОФП • 4-куп
+      </div>
+      <h3 style="font-size: 1.25rem; font-weight: 800; margin-top: 2px;">Таймер + Калькулятор темпа</h3>
+      <p style="font-size: 0.82rem; color: #94a3b8; margin-top: 4px;">
+        5 секунд подготовки после нажатия «Старт», затем 1 минута работы.
+      </p>
+
+      <!-- Выбор упражнения -->
+      <div class="exercise-selector">
+        <button class="ex-btn active" onclick="selectModalExercise('press', this)">
+          Пресс
+          <span>Норма: 40 раз</span>
+        </button>
+        <button class="ex-btn" onclick="selectModalExercise('pushups', this)">
+          Отжимания
+          <span>Норма: 30 раз</span>
+        </button>
+        <button class="ex-btn" onclick="selectModalExercise('plank', this)">
+          Стойка
+          <span>1:00 / 2:30</span>
+        </button>
+      </div>
+
+      <div id="modalTimerMount"></div>
     </div>
-</div>
+  </div>
 
-<div id="app"></div>
+  <footer class="footer">
+    Программа аттестации Тхэквондо 4-куп (Синий пояс) • Оптимизировано для телефона и ноутбука
+  </footer>
 
-<script>
-const db = [
-    // 6 КУП (Пурпурный) - РАЗБИТО ПО ОДНОМУ ПУНКТУ
-    {cup:6, cat:"Удары", t:"На месте (без постановки ноги на пол): Ап Чаги – Дольо Чаги"},
-    {cup:6, cat:"Удары", t:"На месте (без постановки ноги на пол): Ап Чаги – Ёп Чаги"},
-    {cup:6, cat:"Удары", t:"В движении: Нэрё Чаги – Дольо Чаги"},
-    {cup:6, cat:"Удары", t:"В движении: Ёп Чаги – Двит Чаги"},
-    {cup:6, cat:"Удары", t:"Баккат Дольо Чаги (Хурио Чаги)"},
-    {cup:6, cat:"Удары", t:"Дюбон Ап Чаги (Монтон, Ольгуль)"},
-    {cup:6, cat:"Удары", t:"На отходе: Дольо Чаги (с передней через Двит Коа Соги)"},
-    {cup:6, cat:"Удары", t:"На отходе: Дольо Чаги (с задней)"},
-    {cup:6, cat:"Удары", t:"Без постановки ноги на пол: Ап Чаги – Дольо Чаги"},
-    {cup:6, cat:"Удары", t:"Без постановки ноги на пол: Ап Чаги – Ёп Чаги"},
-    {cup:6, cat:"Техника рук", t:"В Ап Куби: Монтон Сонкут Чируги"},
-    {cup:6, cat:"Техника рук", t:"В Ап Куби: Дун Джумок Апе Чиги"},
-    {cup:6, cat:"Техника рук", t:"В Ап Куби: Джеби Пум Сонналь Мок Чиги"},
-    {cup:6, cat:"Степ", t:"Скользящий вперёд, уход без смены стоек"},
-    {cup:6, cat:"Степ", t:"Скользящий вперед уход со сменой стоек"},
-    {cup:6, cat:"Пумсэ", t:"Тэгук Сам Джан + терминология"},
-    {cup:6, cat:"Защита", t:"Блоки от удара Дольо Чаги (Арэ, Монтон, Ольгуль Макки)"},
-    {cup:6, cat:"Физподготовка", t:"Отжимания: 20 раз; Пресс: 30 раз; Стойка на одной руке: 2 мин"},
-    {cup:6, cat:"Теория", q:"Что означают цвета украинского флага?", a:"Синий цвет означает небо, желтый пшеничное поле, символизируя стремление народа Украины к миру и труду."},
-    {cup:6, cat:"Теория", q:"Какой кодекс чести учеников на продвинутой стадии?", a:"1) Уважать друг друга.\n2) Быть честным.\n3) Быть терпеливым к окружающим.\n4) Помогать друг другу.\n5) Защищать слабого.\n6) Быть верным самому себе, своей семье.\n7) Следовать указаниям мастера (учителя) и верить ему.\n8) Быть верным своему залу."},
-    {cup:6, cat:"Теория", q:"Что необходимо помнить, работая в паре?", a:"1) Уйти с линии атаки либо опередить противника контратакой.\n2) Не подставлять противнику спину – это не безопасно, такое поведение не соответствует принципам ТХЭКВОНДО.\n3) Не напрягаться, быть расслабленным физически, но не ослаблять внимание - это может привести к травме или поражению."},
-    {cup:6, cat:"Теория", q:"Что означает зеленый и пурпурный цвет пояса?", a:"Эти цвета пояса означают весну, начало роста и возможностей."},
-    {cup:6, cat:"Теория", q:"Что означает Тэгук-сам-джан?", a:"Знак Тэгук-сам-джан — пламя. Он символизирует стремление направить на плодотворную стезю глубоко сокрытый в каждом из нас огонь. Пумсэ, соответственно символу, очень подвижно и разнообразно."},
+  <script>
+    /**
+     * =========================================================================
+     * 1. ДАННЫЕ БИЛЕТА НА 4-КУП (СИНИЙ ПОЯС)
+     * =========================================================================
+     */
+    const CATEGORIES = [
+      {
+        id: 'kicks_1',
+        shortTitle: 'Удары 1: На месте (Ап соги)',
+        fullTitle: 'Удары передней ногой на месте в стойке Ап соги без постановки ноги на пол',
+        badgeType: 'kicks',
+        enabled: true
+      },
+      {
+        id: 'kicks_2',
+        shortTitle: 'Удары 2: В передвижении (3 удара + скачок)',
+        fullTitle: 'Передвижение в стойке Ап Соги: комбинация из трёх ударов ногами + на скачке в два-три удара',
+        badgeType: 'kicks',
+        enabled: true
+      },
+      {
+        id: 'kicks_3',
+        shortTitle: 'Удары 3: На отходе (Джучум Соги)',
+        fullTitle: 'Передвижение в стойке Джучум Соги в два удара ногами на отходе',
+        badgeType: 'kicks',
+        enabled: true
+      },
+      {
+        id: 'kicks_4',
+        shortTitle: 'Удары 4: В передвижении (2 удара без постановки)',
+        fullTitle: 'Передвижение в стойке Ап Соги: комбинация из двух ударов без постановки ноги на пол',
+        badgeType: 'kicks',
+        enabled: true
+      },
+      {
+        id: 'poomsae',
+        shortTitle: 'Пхумсэ и условный спарринг',
+        fullTitle: 'Пхумсэ Тэгук О Джан + терминология пхумсэ + спарринг условный + жилеты',
+        badgeType: 'poomsae',
+        enabled: true
+      },
+      {
+        id: 'theory',
+        shortTitle: 'Теоретические вопросы',
+        fullTitle: 'Все 4 теоретических вопроса билета 4-куп с развёрнутыми ответами',
+        badgeType: 'theory',
+        enabled: true
+      },
+      {
+        id: 'fitness',
+        shortTitle: 'Физическая подготовка',
+        fullTitle: 'Отжимания (30), пресс (40), стойка на кулаке / одной руке (2,5 мин)',
+        badgeType: 'fitness',
+        enabled: true
+      }
+    ];
 
-    // 5 КУП (Голубой) - РАЗБИТО ПО ОДНОМУ ПУНКТУ
-    {cup:5, cat:"Удары", t:"На месте (без постановки): Ёп Чаги"},
-    {cup:5, cat:"Удары", t:"На месте (без постановки): Дольо Чаги"},
-    {cup:5, cat:"Удары", t:"На месте (без постановки): Баккат Дольо Чаги"},
-    {cup:5, cat:"Удары", t:"В движении: Нэрё Чаги – Двит Чаги"},
-    {cup:5, cat:"Удары", t:"В движении: Дольо Чаги – Двит Чаги"},
-    {cup:5, cat:"Удары", t:"В движении: Торнадо – Дольо Чаги"},
-    {cup:5, cat:"Удары", t:"Двит Дольо Чаги"},
-    {cup:5, cat:"Удары", t:"На скачке: Ап Чаги, Нерьо Чаги"},
-    {cup:5, cat:"Удары", t:"На скачке: Дюбон Бандель Чаги"},
-    {cup:5, cat:"Удары", t:"На отходе: Двит Чаги"},
-    {cup:5, cat:"Удары", t:"На отходе: Двит Дольо Чаги"},
-    {cup:5, cat:"Удары", t:"На отходе: Торнадо"},
-    {cup:5, cat:"Удары", t:"Без постановки ноги: Ёп Чаги – Дольо Чаги"},
-    {cup:5, cat:"Удары", t:"Без постановки ноги: Баккат Дольо Чаги – Дольо Чаги"},
-    {cup:5, cat:"Степ", t:"Смена стойки, скользящий вперед, уход без смены стоек"},
-    {cup:5, cat:"Степ", t:"Оборотный вперёд, скользящий назад, уход со сменой"},
-    {cup:5, cat:"Пумсэ", t:"Тэгук Са Джан + терминология"},
-    {cup:5, cat:"Спарринг", t:"Условный спарринг от Дольо и Нерьо Чаги: уход с блоком + контр атака (Бандель, Ёп, Двит, Торнадо)"},
-    {cup:5, cat:"Физподготовка", t:"Отжимания: 25 раз; Пресс: 35 раз; Стойка на одной руке: 2 мин"},
-    {cup:5, cat:"Теория", q:"Кто имеет право стать участником соревнований?", a:"1) Любой, имеющий национальность ту же, что и выступающая команда.\n2) Любой, рекомендованный национальной федерацией ТХЭКВОНДО.\n3) Любой, имеющий диплом обладателя дана по ТХЭКВОНДО, выданного в Кукивоне (WTF)."},
-    {cup:5, cat:"Теория", q:"Какие требования предъявляются к костюмам участников?", a:"Костюм ТХЭКВОНДО (добок), состоящий из брюк и куртки белого цвета и пояса, должен отвечать требованиям:\nа) рукава должны доходить до запястья и полностью закрывать накладки;\nб) длина куртки должна полностью закрывать пах;\nв) штанины должны доходить до голеностопного сустава и закрывать накладки. Участники проводят поединок босиком."},
-    {cup:5, cat:"Теория", q:"Назовите все восемь пумсэ ученических поясов.", a:"1) Тэгук-иль-джан, 2) Тэгук-и-джан, 3) Тэгук-сам-джан, 4) Тэгук-са-джан, 5) Тэгук-о-джан, 6) Тэгук-юк-джан, 7) Тэгук-чиль-джан, 8) Тэгук-паль-джан."},
-    {cup:5, cat:"Теория", q:"Что означает символ Тэгук-са-джан?", a:"Тэгук-са-джан символизирует гром. В нем преобладают мощные, ритмичные движения. Пумсэ выражает спокойствие и мужество перед лицом опасности и требует при выполнении внутреннего и внешнего равновесия."}
-];
+    const CARDS_DATA = [
+      // --- Раздел 1 ---
+      {
+        id: 'k1_1',
+        categoryId: 'kicks_1',
+        question: 'Ёп Чаги Монтон – Бакат Дольо Чаги – Дольо Чаги',
+        subtitle: 'Удары передней ногой на месте в стойке Ап соги без постановки ноги на пол',
+        answer: 'Выполняется одной (передней) ногой на месте в стойке Ап Соги без опускания стопы на пол между ударами:\n1. Ёп Чаги (боковой удар) в средний уровень (Монтон)\n2. Бакат Дольо Чаги (круговой удар наружу)\n3. Дольо Чаги (круговой удар)'
+      },
+      {
+        id: 'k1_2',
+        categoryId: 'kicks_1',
+        question: 'Баккат Дольо Чаги – Дольо Чаги – Ёп Чаги',
+        subtitle: 'Удары передней ногой на месте в стойке Ап соги без постановки ноги на пол',
+        answer: 'Выполняется одной (передней) ногой на месте в стойке Ап Соги без постановки ноги на пол:\n1. Баккат Дольо Чаги\n2. Дольо Чаги\n3. Ёп Чаги'
+      },
 
-let selectedBelts = [6, 5];
-let currentMode = 'list';
-let randPool = [];
+      // --- Раздел 2 ---
+      {
+        id: 'k2_1',
+        categoryId: 'kicks_2',
+        question: 'Ёп Чаги, Двит Чаги, Дольо Чаги',
+        subtitle: 'Передвижение в стойке Ап Соги: комбинация из трёх ударов ногами + на скачке в два-три удара',
+        answer: '1. Основная связка в передвижении (стойка Ап Соги): Ёп Чаги → Двит Чаги (удар назад с разворотом) → Дольо Чаги.\n2. Дополнительно: выполнение связки на скачке в 2–3 удара.'
+      },
+      {
+        id: 'k2_2',
+        categoryId: 'kicks_2',
+        question: 'Торнадо, Дольо Чаги, Двит Дольо Чаги',
+        subtitle: 'Передвижение в стойке Ап Соги: комбинация из трёх ударов ногами + на скачке в два-три удара',
+        answer: '1. Основная связка в передвижении (стойка Ап Соги): Торнадо (удар в прыжке с разворотом на 360°) → Дольо Чаги → Двит Дольо Чаги (удар с разворотом через спину).\n2. Дополнительно: на скачке в 2–3 удара.'
+      },
+      {
+        id: 'k2_3',
+        categoryId: 'kicks_2',
+        question: 'Нэрё Чаги, Двит Чаги, Двит Дольо Чаги',
+        subtitle: 'Передвижение в стойке Ап Соги: комбинация из трёх ударов ногами + на скачке в два-три удара',
+        answer: '1. Основная связка в передвижении (стойка Ап Соги): Нэрё Чаги (удар сверху вниз) → Двит Чаги → Двит Дольо Чаги.\n2. Дополнительно: на скачке в 2–3 удара.'
+      },
 
-function setBelt(c) {
-    if(selectedBelts.includes(c)) { if(selectedBelts.length > 1) selectedBelts = selectedBelts.filter(x => x !== c); }
-    else selectedBelts.push(c);
-    updateUI();
-}
+      // --- Раздел 3 ---
+      {
+        id: 'k3_1',
+        categoryId: 'kicks_3',
+        question: 'Дольо Чаги (с передней), Дольо Чаги (с задней)',
+        subtitle: 'Передвижение в стойке Джучум Соги в два удара ногами на отходе',
+        answer: 'Выполняется на отходе (движении назад) из стойки всадника (Джучум Соги):\n• Первый удар Дольо Чаги — передней ногой\n• Второй удар Дольо Чаги — задней ногой'
+      },
+      {
+        id: 'k3_2',
+        categoryId: 'kicks_3',
+        question: 'Двит Чаги, Дольо Чаги',
+        subtitle: 'Передвижение в стойке Джучум Соги в два удара ногами на отходе',
+        answer: 'Выполняется на отходе из стойки Джучум Соги:\n1. Двит Чаги (удар назад с разворотом)\n2. Дольо Чаги'
+      },
+      {
+        id: 'k3_3',
+        categoryId: 'kicks_3',
+        question: 'Двит Дольо Чаги',
+        subtitle: 'Передвижение в стойке Джучум Соги в два удара ногами на отходе',
+        answer: 'Выполняется на отходе из стойки Джучум Соги: удар с разворотом через спину (Двит Дольо Чаги) с возвратом в стойку.'
+      },
 
-function setMode(m, btn) {
-    currentMode = m;
-    document.querySelectorAll('#modes .btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    render();
-}
+      // --- Раздел 4 ---
+      {
+        id: 'k4_1',
+        categoryId: 'kicks_4',
+        question: 'Ёп Чаги Монтон, Баккат Дольо Чаги, Дольо Чаги',
+        subtitle: 'Передвижение в стойке Ап Соги: комбинация из двух ударов без постановки ноги на пол',
+        answer: 'Передвижение в стойке Ап Соги с выполнением ударов одной ногой без постановки стопы на пол: Ёп Чаги (средний уровень) → Баккат Дольо Чаги → Дольо Чаги.'
+      },
+      {
+        id: 'k4_2',
+        categoryId: 'kicks_4',
+        question: 'Баккат Дольо Чаги – Дольо Чаги, Ёп Чаги',
+        subtitle: 'Передвижение в стойке Ап Соги: комбинация из двух ударов без постановки ноги на пол',
+        answer: 'Передвижение в стойке Ап Соги с выполнением связки без постановки ноги на пол: Баккат Дольо Чаги – Дольо Чаги → Ёп Чаги.'
+      },
 
-function updateUI() {
-    const btns = document.querySelectorAll('#belts .btn');
-    btns[0].classList.toggle('active', selectedBelts.includes(6));
-    btns[1].classList.toggle('active', selectedBelts.includes(5));
-    render();
-}
+      // --- Раздел 5: Пхумсэ и спарринг ---
+      {
+        id: 'p_1',
+        categoryId: 'poomsae',
+        question: 'Пхумсэ Тэгук О Джан + терминология пхумсэ',
+        subtitle: 'Демонстрация 5-го комплекса и знание терминологии',
+        answer: '• Выполнить Пхумсэ Тэгук О Джан (20 движений).\n• Символ Тэгук-О-Джан — ВЕТЕР. Приёмы спокойны и мощны, ритмичны и сдержанны, с демонстрацией внешней силы в двойных и тройных приёмах.\n• Терминология: стойки (Ап Соги, Ап Куби, Двит Куби, Твит Коа Соги), блоки (Аре Макки, Монтон Макки, Ольгуль Макки, Хэнсонналь Монтон Баккат Макки).'
+      },
+      {
+        id: 'p_2',
+        categoryId: 'poomsae',
+        question: 'Спарринг условный: Атака — Ёп Чаги',
+        subtitle: 'На каждую атаку выполнить степ (уход) и контр удар',
+        answer: 'Уход (степ) + Бандель Чаги'
+      },
+      {
+        id: 'p_3',
+        categoryId: 'poomsae',
+        question: 'Спарринг условный: Атака — Двит Чаги',
+        subtitle: 'На каждую атаку выполнить степ (уход) и контр удар',
+        answer: 'Уход (степ) + Бандель Чаги'
+      },
+      {
+        id: 'p_4',
+        categoryId: 'poomsae',
+        question: 'Спарринг условный: Атака — Дольо Чаги',
+        subtitle: 'На каждую атаку выполнить степ (уход) и контр удар',
+        answer: 'Уход (степ) + Бандель Чаги'
+      },
+      {
+        id: 'p_5',
+        categoryId: 'poomsae',
+        question: 'Спарринг условный: Атака — Нерьо Чаги',
+        subtitle: 'На каждую атаку выполнить степ (уход) и контр удар',
+        answer: 'Уход (степ) + Бандель Чаги'
+      },
+      {
+        id: 'p_5b',
+        categoryId: 'poomsae',
+        question: 'Спарринг условный: Атака — Двит Чаги (повторная связка по билету)',
+        subtitle: 'На каждую атаку выполнить степ (уход) и контр удар',
+        answer: 'Уход (степ) + Бандель Чаги'
+      },
+      {
+        id: 'p_6',
+        categoryId: 'poomsae',
+        question: 'Спарринги на жилетах по двум уровням',
+        subtitle: 'Свободный поединок в защитных протекторах',
+        answer: 'Работа в спарринге на жилетах (хогу) с контролем дистанции и нанесением ударов по двум уровням: средний уровень (корпус / Монтон) и верхний уровень (голова / Ольгуль).'
+      },
 
-function render() {
-    const app = document.getElementById('app');
-    app.innerHTML = '';
-    let filtered = db.filter(x => selectedBelts.includes(x.cup));
+      // --- Раздел 6: Теоретические вопросы (дословно по фото) ---
+      {
+        id: 't_1',
+        categoryId: 'theory',
+        isTheory: true,
+        question: '1.(В) Каковы обязанности и права спортсмена на соревнованиях?',
+        subtitle: 'Теоретический вопрос №1',
+        answer: '(О) Основные из них:\n- знать и строго соблюдать все правила соревнований;\n- быть вежливым и корректным по отношению ко всем участникам, судьям и лицам, проводящим и обслуживающим соревнования;\n- выполнять все требования судей и представителя (капитана) команды;\n- строго соблюдать ритуал начала и конца поединка (выступления).'
+      },
+      {
+        id: 't_2',
+        categoryId: 'theory',
+        isTheory: true,
+        question: '2.(В) Какие 5 составляющих физического развития ТХЭКВОНДО вы знаете?',
+        subtitle: 'Теоретический вопрос №2',
+        answer: '(О)\n1) связь с окружающей природой;\n2) опробование себя в различных физических условиях;\n3) выполнение необходимых для себя упражнений;\n4) потребление приемлемой пищи;\n5) необходимый отдых.'
+      },
+      {
+        id: 't_3',
+        categoryId: 'theory',
+        isTheory: true,
+        question: '3.(В) Как можно объяснить значение каждого пояса в ТХЭКВОНДО?',
+        subtitle: 'Теоретический вопрос №3',
+        answer: '(О)\n• Отсутствие пояса — означает целомудрие, пустоту и чистоту.\n• Белый пояс — более весомое значение, чем отсутствие пояса, и готовность повысить свой квалификационный уровень.\n• Желтый и оранжевый пояса — восход Солнца и готовность получать знания.\n• Зелёный и пурпурный пояса — означают весну, начало роста и возможностей.\n• Голубой и синий пояса — это небо, юность и желание творить.\n• Красный пояс — кровь, развитие крепкой основы тела и характера бойца. Это также предупреждает об опасности.\n• Коричневый пояс — означает землю и горы, развитие мощной основы в технике и характере.\n• Черный пояс — объединяет все цвета, символизируя наиболее глубокие, прочные знания, суммирование всех предыдущих уровней подготовки.'
+      },
+      {
+        id: 't_4',
+        categoryId: 'theory',
+        isTheory: true,
+        question: '4.(В) Что означает Тэгук-о-джан?',
+        subtitle: 'Теоретический вопрос №4',
+        answer: '(О) Символ Тэгук-о-джан – ветер. Соответственно природе ветра приемы Тэгук-о-джан спокойны и мощны. Пумсэ в целом очень ритмично и сдержанно, кроме позиций, где демонстрируется внешняя сила (в двойных и тройных приемах).'
+      },
 
-    if(currentMode === 'list') {
-        const cats = ["Удары", "Техника рук", "Степ", "Пумсэ", "Защита", "Спарринг", "Теория", "Физподготовка"];
-        cats.forEach(cat => {
-            const items = filtered.filter(f => f.cat === cat);
-            if(items.length) {
-                app.innerHTML += `<div class="section-title">${cat}</div>`;
-                items.forEach(i => {
-                    const color = i.cup === 6 ? 'var(--purple)' : 'var(--blue)';
-                    app.innerHTML += `
-                        <div class="card" style="border-left-color: ${color}">
-                            <div class="cup-tag" style="color: ${color}">${i.cup} КУП</div>
-                            <div class="task-text">${i.q || i.t}</div>
-                            ${i.a ? `<div class="theory-ans"><b>ОТВЕТ:</b>\n${i.a}</div>` : ''}
-                        </div>`;
-                });
-            }
-        });
-    } else {
-        if(currentMode === 'rand-theory') filtered = filtered.filter(x => x.cat === 'Теория');
-        if(!randPool.length) randPool = [...filtered].sort(() => Math.random() - 0.5);
-        
-        const item = randPool[randPool.length - 1];
-        const color = item.cup === 6 ? 'var(--purple)' : 'var(--blue)';
-        
-        app.innerHTML = `
-            <div class="random-box" onclick="document.getElementById('ans').classList.toggle('hidden')">
-                <div class="cup-tag" style="color: ${color}; font-size: 1rem">${item.cup} КУП | ${item.cat}</div>
-                <div class="task-text" style="font-size: 1.4rem; font-weight: bold; margin: 20px 0;">${item.q || item.t}</div>
-                <div id="ans" class="theory-ans hidden" style="text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; border: 1px solid #eee;">${item.a || "Это практическое задание (без текста)"}</div>
-                ${item.a ? '<div style="margin-top:20px; color: #888; font-size: 0.8rem">Нажми, чтобы увидеть полный ответ</div>' : ''}
-            </div>
-            <button class="btn-next" onclick="randPool.pop(); render()">СЛЕДУЮЩЕЕ (Осталось: ${randPool.length - 1})</button>
-        `;
+      // --- Раздел 7: Физическая подготовка (с таймером + калькулятором темпа) ---
+      {
+        id: 'f_1',
+        categoryId: 'fitness',
+        fitnessConfig: {
+          mode: 'pushups',
+          label: 'Отжимания',
+          normReps: 30,
+          defaultSec: 60,
+          altSec: null
+        },
+        question: 'Сгибание-разгибание рук в упоре лежа от пола — 30 раз',
+        subtitle: 'Тестирование по физподготовке • Таймер 1:00 (5 сек подготовка) + расчёт темпа',
+        answer: 'Норматив по фото: 30 отжиманий от пола. Запустите таймер на 1 минуту (после 5 секунд подготовки), а в конце введите количество повторений, чтобы узнать темп в секунду, за 10 секунд и время на 30 раз.'
+      },
+      {
+        id: 'f_2',
+        categoryId: 'fitness',
+        fitnessConfig: {
+          mode: 'press',
+          label: 'Пресс',
+          normReps: 40,
+          defaultSec: 60,
+          altSec: null
+        },
+        question: 'Упражнение на мышцы пресса — 40 раз',
+        subtitle: 'Тестирование по физподготовке • Таймер 1:00 (5 сек подготовка) + расчёт темпа',
+        answer: 'Норматив по фото: 40 повторений на пресс. Запустите таймер на 1 минуту (после 5 секунд подготовки), а после сигнала введите ваш счёт, чтобы рассчитать темп и время выполнения нормы (40 раз).'
+      },
+      {
+        id: 'f_3',
+        categoryId: 'fitness',
+        fitnessConfig: {
+          mode: 'plank',
+          label: 'Стойка на кулаке / одной руке',
+          normReps: null,
+          defaultSec: 60,
+          altSec: 150
+        },
+        question: 'Стойка на кулаке / на одной руке в упоре лежа — 2,5 мин',
+        subtitle: 'Тестирование по физподготовке • Таймер 1:00 или 2:30 (5 сек подготовка)',
+        answer: 'Норматив по фото: стойка на одной руке / на кулаках в упоре лёжа — 2,5 минуты (150 секунд). Можно тренироваться по 1 минуте или переключить таймер на полные 2:30.'
+      }
+    ];
+
+    /**
+     * =========================================================================
+     * 2. СОСТОЯНИЕ ПРИЛОЖЕНИЯ И ЗВУКОВОЙ ДВИЖОК (WEB AUDIO API)
+     * =========================================================================
+     */
+    const appState = {
+      viewMode: 'cards', // 'cards' | 'list'
+      currentCard: null,
+      isAnswerVisible: false,
+      noRepeatMode: true,
+      seenIds: new Set(),
+      soundEnabled: true,
+      searchQuery: '',
+      expandedItemIds: new Set(),
+      allAnswersExpanded: false
+    };
+
+    let audioCtx = null;
+
+    function playTone(freq = 660, duration = 0.12, type = 'sine', vol = 0.25) {
+      if (!appState.soundEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
     }
-}
 
-render();
-</script>
+    function toggleSound() {
+      appState.soundEnabled = !appState.soundEnabled;
+      const btn = document.getElementById('soundBtn');
+      const svg = document.getElementById('soundSvg');
+      if (appState.soundEnabled) {
+        btn.classList.remove('muted');
+        svg.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        `;
+        playTone(720, 0.1);
+      } else {
+        btn.classList.add('muted');
+        svg.innerHTML = `
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <line x1="23" y1="9" x2="17" y2="15"></line>
+          <line x1="17" y1="9" x2="23" y2="15"></line>
+        `;
+      }
+    }
+
+    /**
+     * =========================================================================
+     * 3. ТАЙМЕР ОФП (5 СЕК ПОДГОТОВКА + 1:00 / 2:30 + КАЛЬКУЛЯТОР ТЕМПА)
+     * =========================================================================
+     */
+    class FitnessTimer {
+      constructor(mountId, config) {
+        this.mountId = mountId;
+        this.config = config; // { mode: 'press'|'pushups'|'plank', label, normReps, defaultSec, altSec }
+        this.prepSec = 5;
+        this.workDuration = config.defaultSec || 60;
+        this.phase = 'idle'; // 'idle' | 'prep' | 'work' | 'done'
+        this.remaining = this.workDuration;
+        this.elapsedWorkSec = 0;
+        this.isPaused = false;
+        this.timerId = null;
+
+        // Для калькулятора пресса и отжиманий
+        this.repsCount = config.normReps || 30;
+      }
+
+      stop() {
+        if (this.timerId) {
+          clearInterval(this.timerId);
+          this.timerId = null;
+        }
+      }
+
+      setDuration(sec) {
+        this.stop();
+        this.workDuration = sec;
+        this.phase = 'idle';
+        this.remaining = sec;
+        this.elapsedWorkSec = 0;
+        this.isPaused = false;
+        this.render();
+      }
+
+      start() {
+        playTone(540, 0.08, 'sine', 0.2);
+
+        if (this.phase === 'idle' || this.phase === 'done') {
+          this.phase = 'prep';
+          this.remaining = this.prepSec;
+          this.elapsedWorkSec = 0;
+          this.isPaused = false;
+        } else if (this.isPaused) {
+          this.isPaused = false;
+        }
+
+        this.stop();
+        this.render();
+
+        this.timerId = setInterval(() => {
+          if (this.isPaused) return;
+
+          this.remaining -= 1;
+
+          if (this.phase === 'prep') {
+            if (this.remaining > 0) {
+              if (this.remaining <= 3) playTone(600, 0.1, 'sine', 0.25);
+            } else {
+              // Старт основной минуты!
+              this.phase = 'work';
+              this.remaining = this.workDuration;
+              this.elapsedWorkSec = 0;
+              playTone(880, 0.35, 'triangle', 0.35);
+            }
+          } else if (this.phase === 'work') {
+            this.elapsedWorkSec += 1;
+            if (this.remaining > 0 && this.remaining <= 3) {
+              playTone(620, 0.1, 'sine', 0.25);
+            } else if (this.remaining <= 0) {
+              this.finishWorkout();
+              return;
+            }
+          }
+
+          this.render();
+        }, 1000);
+      }
+
+      pause() {
+        this.isPaused = true;
+        this.render();
+      }
+
+      finishEarly() {
+        if (this.phase === 'work') {
+          this.finishWorkout();
+        }
+      }
+
+      finishWorkout() {
+        this.stop();
+        this.phase = 'done';
+        this.remaining = 0;
+        if (this.elapsedWorkSec <= 0) {
+          this.elapsedWorkSec = this.workDuration;
+        }
+        playTone(660, 0.14, 'triangle', 0.3);
+        setTimeout(() => playTone(880, 0.14, 'triangle', 0.3), 160);
+        setTimeout(() => playTone(1100, 0.35, 'triangle', 0.35), 320);
+        this.render();
+      }
+
+      reset() {
+        this.stop();
+        this.phase = 'idle';
+        this.remaining = this.workDuration;
+        this.elapsedWorkSec = 0;
+        this.isPaused = false;
+        this.render();
+      }
+
+      adjustReps(delta) {
+        const nextVal = Math.max(1, (parseInt(this.repsCount, 10) || 0) + delta);
+        this.repsCount = nextVal;
+        const inputEl = document.getElementById(`${this.mountId}_repsInput`);
+        if (inputEl) inputEl.value = nextVal;
+        this.updateCalculatorStats();
+      }
+
+      onRepsInput(val) {
+        const parsed = parseInt(val, 10);
+        this.repsCount = isNaN(parsed) || parsed < 0 ? 0 : parsed;
+        this.updateCalculatorStats();
+      }
+
+      formatClock(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+      }
+
+      formatDurationText(totalSec) {
+        if (!isFinite(totalSec) || totalSec <= 0) return '—';
+        const rounded = Math.round(totalSec);
+        if (rounded < 60) {
+          return `${rounded} сек`;
+        }
+        const m = Math.floor(rounded / 60);
+        const s = rounded % 60;
+        return s === 0 ? `${m} мин` : `${m} мин ${s} сек`;
+      }
+
+      updateCalculatorStats() {
+        const statsMount = document.getElementById(`${this.mountId}_calcStats`);
+        if (!statsMount) return;
+
+        const reps = this.repsCount;
+        const timeUsed = Math.max(1, this.elapsedWorkSec || this.workDuration);
+        const normTarget = this.config.normReps; // 30 для отжиманий, 40 для пресса
+
+        if (!reps || reps <= 0) {
+          statsMount.innerHTML = `<div style="font-size:0.82rem; color:#94a3b8;">Введите количество сделанных повторений (больше 0), чтобы увидеть расчёт темпа.</div>`;
+          return;
+        }
+
+        const perSec = reps / timeUsed;
+        const secPerRep = timeUsed / reps;
+        const per10Sec = perSec * 10;
+        const estNormSeconds = normTarget / perSec;
+
+        const fitsInMinute = estNormSeconds <= 60;
+        const verdictClass = fitsInMinute ? 'ok' : 'warn';
+        const verdictText = fitsInMinute
+          ? `Отлично! При таком темпе вы укладываетесь в 1 минуту (норма ${normTarget} раз примерно за ${this.formatDurationText(estNormSeconds)}).`
+          : `При таком темпе норма по фото (${normTarget} раз) займёт примерно ${this.formatDurationText(estNormSeconds)}. Чтобы уложиться в 60 сек, нужно ~${(normTarget / 6).toFixed(1)} раз за 10 сек.`;
+
+        statsMount.innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-tile">
+              <div class="stat-label">За 1 секунду</div>
+              <div class="stat-value">${perSec.toFixed(2)} раз/с</div>
+              <div class="stat-note">1 повтор ≈ ${secPerRep.toFixed(1)} сек</div>
+            </div>
+            <div class="stat-tile">
+              <div class="stat-label">За 10 секунд</div>
+              <div class="stat-value">~${per10Sec.toFixed(1)} раз</div>
+              <div class="stat-note">средний темп</div>
+            </div>
+            <div class="stat-tile highlight">
+              <div class="stat-label">Норма (${normTarget} раз)</div>
+              <div class="stat-value">~${this.formatDurationText(estNormSeconds)}</div>
+              <div class="stat-note">за время работы: ${timeUsed}с</div>
+            </div>
+          </div>
+          <div class="norm-verdict ${verdictClass}">${verdictText}</div>
+        `;
+      }
+
+      render() {
+        const mount = document.getElementById(this.mountId);
+        if (!mount) return;
+
+        let badgeText = 'Готов к старту (5 сек подготовка)';
+        let badgeClass = '';
+        let digitsText = this.formatClock(this.workDuration);
+        let digitsClass = '';
+        let fillPct = 100;
+        let fillClass = '';
+
+        if (this.phase === 'prep') {
+          badgeText = 'ПРИГОТОВИТЬСЯ! СТАРТ ЧЕРЕЗ...';
+          badgeClass = 'prep';
+          digitsText = `0:0${this.remaining}`;
+          digitsClass = 'prep';
+          fillPct = (this.remaining / this.prepSec) * 100;
+          fillClass = 'prep';
+        } else if (this.phase === 'work') {
+          badgeText = this.isPaused ? 'ПАУЗА' : 'ВРЕМЯ ПОШЛО! РАБОТАЕМ!';
+          badgeClass = this.isPaused ? '' : 'work';
+          digitsText = this.formatClock(this.remaining);
+          digitsClass = this.remaining <= 5 ? 'urgent' : 'work';
+          fillPct = (this.remaining / this.workDuration) * 100;
+          fillClass = this.remaining <= 5 ? 'urgent' : 'work';
+        } else if (this.phase === 'done') {
+          badgeText = 'ВРЕМЯ ВЫШЛО!';
+          badgeClass = 'done';
+          digitsText = '0:00';
+          digitsClass = 'done';
+          fillPct = 0;
+        }
+
+        // Переключатель 1:00 / 2:30 для стойки
+        const durTabsHtml = this.config.altSec ? `
+          <div class="duration-tabs">
+            <button class="dur-tab ${this.workDuration === 60 ? 'active' : ''}" onclick="currentTimerRef.setDuration(60)">
+              1:00 (Тренировка)
+            </button>
+            <button class="dur-tab ${this.workDuration === this.config.altSec ? 'active' : ''}" onclick="currentTimerRef.setDuration(${this.config.altSec})">
+              2:30 (Норматив по фото)
+            </button>
+          </div>
+        ` : '';
+
+        // Кнопки управления
+        let controlsHtml = '';
+        if (this.phase === 'idle' || this.phase === 'done') {
+          controlsHtml = `
+            <button class="btn-timer-start" onclick="currentTimerRef.start()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>${this.phase === 'done' ? 'Повторить (5с + ' + this.formatClock(this.workDuration) + ')' : 'Старт (5с подготовка)'}</span>
+            </button>
+          `;
+        } else {
+          controlsHtml = `
+            ${this.isPaused ? `
+              <button class="btn-timer-start" onclick="currentTimerRef.start()">Продолжить</button>
+            ` : `
+              <button class="btn-timer-secondary" onclick="currentTimerRef.pause()">Пауза</button>
+            `}
+            ${this.phase === 'work' && this.config.normReps ? `
+              <button class="btn-timer-finish-early" onclick="currentTimerRef.finishEarly()">Готово (ввести счёт)</button>
+            ` : ''}
+            <button class="btn-timer-secondary" onclick="currentTimerRef.reset()">Сброс</button>
+          `;
+        }
+
+        // Калькулятор повторений появляется в конце таймера для пресса и отжиманий
+        const showCalculator = this.phase === 'done' && this.config.normReps;
+        const calculatorHtml = showCalculator ? `
+          <div class="pace-calc-box">
+            <div class="pace-calc-title">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+                <line x1="8" y1="6" x2="16" y2="6"></line>
+                <line x1="8" y1="10" x2="10" y2="10"></line>
+                <line x1="14" y1="10" x2="16" y2="10"></line>
+                <line x1="8" y1="14" x2="10" y2="14"></line>
+                <line x1="14" y1="14" x2="16" y2="14"></line>
+                <line x1="8" y1="18" x2="16" y2="18"></line>
+              </svg>
+              <span>Сколько раз вы сделали? (${this.config.label})</span>
+            </div>
+            <p class="pace-calc-sub">Введите результат за ${this.elapsedWorkSec} сек — рассчитаем скорость и прогноз по норме (${this.config.normReps} раз):</p>
+
+            <div class="rep-stepper">
+              <button class="step-btn" onclick="currentTimerRef.adjustReps(-5)">-5</button>
+              <button class="step-btn" onclick="currentTimerRef.adjustReps(-1)">-1</button>
+              <input id="${this.mountId}_repsInput" class="rep-input" type="number" min="1" max="500"
+                value="${this.repsCount}" oninput="currentTimerRef.onRepsInput(this.value)" />
+              <button class="step-btn" onclick="currentTimerRef.adjustReps(1)">+1</button>
+              <button class="step-btn" onclick="currentTimerRef.adjustReps(5)">+5</button>
+            </div>
+
+            <div id="${this.mountId}_calcStats"></div>
+          </div>
+        ` : '';
+
+        mount.innerHTML = `
+          <div class="workout-box">
+            ${durTabsHtml}
+            <div class="timer-phase-badge ${badgeClass}">${badgeText}</div>
+            <div class="timer-digits ${digitsClass}">${digitsText}</div>
+            <div class="progress-track">
+              <div class="progress-fill ${fillClass}" style="width: ${fillPct}%"></div>
+            </div>
+            <div class="timer-controls">
+              ${controlsHtml}
+            </div>
+            ${calculatorHtml}
+          </div>
+        `;
+
+        if (showCalculator) {
+          this.updateCalculatorStats();
+        }
+      }
+    }
+
+    let cardTimer = null;
+    let modalTimer = null;
+    let currentTimerRef = null;
+
+    /**
+     * =========================================================================
+     * 4. ФИЛЬТРАЦИЯ РАЗДЕЛОВ И МОБИЛЬНАЯ ШТОРКА
+     * =========================================================================
+     */
+    function renderCategoryFilters() {
+      const listEl = document.getElementById('categoryList');
+      listEl.innerHTML = '';
+      let activeCount = 0;
+
+      CATEGORIES.forEach(cat => {
+        if (cat.enabled) activeCount++;
+        const count = CARDS_DATA.filter(c => c.categoryId === cat.id).length;
+
+        const row = document.createElement('div');
+        row.className = `cat-item ${cat.enabled ? 'active' : ''}`;
+        row.onclick = () => toggleCategory(cat.id);
+
+        row.innerHTML = `
+          <div class="cat-checkbox" aria-hidden="true">
+            ${cat.enabled ? `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            ` : ''}
+          </div>
+          <div class="cat-info">
+            <div class="cat-top">
+              <span class="cat-name">${cat.shortTitle}</span>
+              <span class="cat-count">${count}</span>
+            </div>
+            <div class="cat-desc">${cat.fullTitle}</div>
+          </div>
+        `;
+        listEl.appendChild(row);
+      });
+
+      document.getElementById('mobileCountBadge').textContent = `${activeCount}/${CATEGORIES.length}`;
+      document.getElementById('activeCatsText').textContent = `${activeCount} из ${CATEGORIES.length}`;
+    }
+
+    function toggleCategory(catId) {
+      const cat = CATEGORIES.find(c => c.id === catId);
+      if (!cat) return;
+      cat.enabled = !cat.enabled;
+      renderCategoryFilters();
+
+      if (appState.currentCard && appState.currentCard.categoryId === catId && !cat.enabled) {
+        drawNextCard();
+      } else {
+        updateProgressUI();
+      }
+      renderCatalogList();
+    }
+
+    function applyFilterPreset(preset) {
+      CATEGORIES.forEach(cat => {
+        if (preset === 'all') cat.enabled = true;
+        else if (preset === 'none') cat.enabled = false;
+        else if (preset === 'kicks') cat.enabled = cat.id.startsWith('kicks_');
+        else if (preset === 'theory_fitness') cat.enabled = (cat.id === 'theory' || cat.id === 'fitness');
+      });
+      renderCategoryFilters();
+
+      const available = getAvailableCards();
+      if (available.length === 0) {
+        renderEmptyState();
+      } else if (!appState.currentCard || !CATEGORIES.find(c => c.id === appState.currentCard.categoryId).enabled) {
+        drawNextCard();
+      } else {
+        updateProgressUI();
+      }
+      renderCatalogList();
+    }
+
+    function openMobileDrawer() {
+      document.getElementById('filterSidebar').classList.add('open');
+      document.getElementById('drawerBackdrop').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileDrawer() {
+      document.getElementById('filterSidebar').classList.remove('open');
+      document.getElementById('drawerBackdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function toggleNoRepeatMode() {
+      appState.noRepeatMode = document.getElementById('noRepeatToggle').checked;
+      appState.seenIds.clear();
+      if (appState.currentCard) {
+        appState.seenIds.add(appState.currentCard.id);
+      }
+      updateProgressUI();
+    }
+
+    /**
+     * =========================================================================
+     * 5. ЛОГИКА СЛУЧАЙНЫХ КАРТОЧЕК И ОТВЕТОВ
+     * =========================================================================
+     */
+    function getAvailableCards() {
+      const activeCatIds = new Set(CATEGORIES.filter(c => c.enabled).map(c => c.id));
+      return CARDS_DATA.filter(card => activeCatIds.has(card.categoryId));
+    }
+
+    function drawNextCard() {
+      if (cardTimer) {
+        cardTimer.stop();
+        cardTimer = null;
+      }
+
+      const available = getAvailableCards();
+      if (available.length === 0) {
+        renderEmptyState();
+        return;
+      }
+
+      let pool = available;
+      if (appState.noRepeatMode) {
+        const unseen = available.filter(c => !appState.seenIds.has(c.id));
+        if (unseen.length === 0) {
+          appState.seenIds.clear();
+          pool = available.length > 1 && appState.currentCard
+            ? available.filter(c => c.id !== appState.currentCard.id)
+            : available;
+        } else {
+          pool = unseen;
+        }
+      } else if (available.length > 1 && appState.currentCard) {
+        pool = available.filter(c => c.id !== appState.currentCard.id);
+      }
+
+      const chosen = pool[Math.floor(Math.random() * pool.length)];
+      appState.currentCard = chosen;
+      appState.isAnswerVisible = false;
+      appState.seenIds.add(chosen.id);
+
+      renderCard(chosen);
+      updateProgressUI();
+    }
+
+    function resetDeck() {
+      appState.seenIds.clear();
+      drawNextCard();
+    }
+
+    function updateProgressUI() {
+      const available = getAvailableCards();
+      if (available.length === 0) {
+        document.getElementById('progressText').textContent = '0 / 0';
+        return;
+      }
+      const seenActive = available.filter(c => appState.seenIds.has(c.id)).length;
+      document.getElementById('progressText').textContent = `${seenActive} / ${available.length}`;
+    }
+
+    function renderEmptyState() {
+      appState.currentCard = null;
+      document.getElementById('toggleAnswerBtn').disabled = true;
+      document.getElementById('cardBody').innerHTML = `
+        <div class="empty-state">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <h3>Все разделы исключены</h3>
+          <p>Выберите хотя бы один раздел в списке фильтров, чтобы продолжить подготовку.</p>
+          <button class="btn-next" onclick="applyFilterPreset('all')">Включить все разделы</button>
+        </div>
+      `;
+      updateProgressUI();
+    }
+
+    function renderCard(card) {
+      const cat = CATEGORIES.find(c => c.id === card.categoryId);
+      const bodyEl = document.getElementById('cardBody');
+
+      bodyEl.classList.remove('animate-in');
+      void bodyEl.offsetWidth;
+      bodyEl.classList.add('animate-in');
+
+      document.getElementById('toggleAnswerBtn').disabled = false;
+      updateAnswerButton();
+
+      const hasFitnessTimer = Boolean(card.fitnessConfig);
+
+      bodyEl.innerHTML = `
+        <div>
+          <div class="card-meta">
+            <span class="category-badge ${cat.badgeType}">${cat.shortTitle}</span>
+            <span class="ticket-tag">Билет 4-куп</span>
+          </div>
+
+          <p class="card-subtitle">${card.subtitle}</p>
+          <h2 class="card-question">${card.question}</h2>
+        </div>
+
+        ${hasFitnessTimer ? `<div id="cardFitnessMount"></div>` : ''}
+
+        <div id="answerPanel" class="answer-panel ${appState.isAnswerVisible ? 'visible' : ''}">
+          <div class="answer-label">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>${card.isTheory ? 'Ответ на теоретический вопрос' : 'Подсказка и выполнение'}</span>
+          </div>
+          <div class="answer-body">${card.answer}</div>
+        </div>
+      `;
+
+      if (hasFitnessTimer) {
+        cardTimer = new FitnessTimer('cardFitnessMount', card.fitnessConfig);
+        currentTimerRef = cardTimer;
+        cardTimer.render();
+      }
+    }
+
+    function toggleAnswer() {
+      if (!appState.currentCard) return;
+      appState.isAnswerVisible = !appState.isAnswerVisible;
+      const panel = document.getElementById('answerPanel');
+      if (panel) {
+        panel.classList.toggle('visible', appState.isAnswerVisible);
+      }
+      updateAnswerButton();
+    }
+
+    function updateAnswerButton() {
+      const label = document.getElementById('answerBtnLabel');
+      const eyeSvg = document.getElementById('answerEyeSvg');
+      if (appState.isAnswerVisible) {
+        label.textContent = 'Скрыть ответ';
+        eyeSvg.innerHTML = `
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        `;
+      } else {
+        label.textContent = 'Показать ответ';
+        eyeSvg.innerHTML = `
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        `;
+      }
+    }
+
+    /**
+     * =========================================================================
+     * 5.1. ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ И СПИСОК ВСЕХ ЗАДАНИЙ И ОТВЕТОВ
+     * =========================================================================
+     */
+    function switchViewMode(mode) {
+      appState.viewMode = mode;
+      const cardsView = document.getElementById('cardsView');
+      const listView = document.getElementById('listView');
+      const tabCards = document.getElementById('tabCardsBtn');
+      const tabList = document.getElementById('tabListBtn');
+
+      if (mode === 'cards') {
+        cardsView.classList.remove('hidden-view');
+        listView.classList.add('hidden-view');
+        tabCards.classList.add('active');
+        tabCards.setAttribute('aria-selected', 'true');
+        tabList.classList.remove('active');
+        tabList.setAttribute('aria-selected', 'false');
+      } else {
+        cardsView.classList.add('hidden-view');
+        listView.classList.remove('hidden-view');
+        tabList.classList.add('active');
+        tabList.setAttribute('aria-selected', 'true');
+        tabCards.classList.remove('active');
+        tabCards.setAttribute('aria-selected', 'false');
+        renderCatalogList();
+      }
+    }
+
+    function onCatalogSearch(value) {
+      appState.searchQuery = value.trim().toLowerCase();
+      const clearBtn = document.getElementById('searchClearBtn');
+      if (clearBtn) {
+        clearBtn.classList.toggle('visible', appState.searchQuery.length > 0);
+      }
+      renderCatalogList();
+    }
+
+    function clearCatalogSearch() {
+      const input = document.getElementById('catalogSearchInput');
+      if (input) input.value = '';
+      onCatalogSearch('');
+    }
+
+    function toggleCatalogItemAnswer(itemId) {
+      if (appState.expandedItemIds.has(itemId)) {
+        appState.expandedItemIds.delete(itemId);
+      } else {
+        appState.expandedItemIds.add(itemId);
+      }
+      const answerEl = document.getElementById(`cat_ans_${itemId}`);
+      const btnEl = document.getElementById(`cat_btn_${itemId}`);
+      const isOpen = appState.expandedItemIds.has(itemId);
+      if (answerEl) answerEl.classList.toggle('visible', isOpen);
+      if (btnEl) {
+        btnEl.classList.toggle('open', isOpen);
+        btnEl.querySelector('span').textContent = isOpen ? 'Скрыть ответ' : 'Показать ответ';
+      }
+    }
+
+    function toggleAllCatalogAnswers() {
+      const visibleCards = getFilteredCatalogCards();
+      appState.allAnswersExpanded = !appState.allAnswersExpanded;
+
+      if (appState.allAnswersExpanded) {
+        visibleCards.forEach(c => appState.expandedItemIds.add(c.id));
+      } else {
+        visibleCards.forEach(c => appState.expandedItemIds.delete(c.id));
+      }
+
+      const labelEl = document.getElementById('toggleAllAnswersLabel');
+      if (labelEl) {
+        labelEl.textContent = appState.allAnswersExpanded ? 'Скрыть все ответы' : 'Показать все ответы';
+      }
+      renderCatalogList();
+    }
+
+    function getFilteredCatalogCards() {
+      const activeCatIds = new Set(CATEGORIES.filter(c => c.enabled).map(c => c.id));
+      const q = appState.searchQuery;
+      return CARDS_DATA.filter(card => {
+        if (!activeCatIds.has(card.categoryId)) return false;
+        if (!q) return true;
+        return (
+          card.question.toLowerCase().includes(q) ||
+          card.answer.toLowerCase().includes(q) ||
+          card.subtitle.toLowerCase().includes(q)
+        );
+      });
+    }
+
+    function openTimerForExercise(modeKey) {
+      openQuickTimerModal();
+      const targetKey = MODAL_EXERCISES[modeKey] ? modeKey : 'press';
+      const buttons = document.querySelectorAll('.ex-btn');
+      const idx = targetKey === 'press' ? 0 : targetKey === 'pushups' ? 1 : 2;
+      if (buttons[idx]) {
+        selectModalExercise(targetKey, buttons[idx]);
+      }
+    }
+
+    function renderCatalogList() {
+      const container = document.getElementById('catalogContainer');
+      const countLabel = document.getElementById('catalogCountLabel');
+      if (!container) return;
+
+      const enabledCategories = CATEGORIES.filter(c => c.enabled);
+      const filteredCards = getFilteredCatalogCards();
+
+      if (countLabel) {
+        countLabel.textContent = filteredCards.length;
+      }
+
+      if (enabledCategories.length === 0) {
+        container.innerHTML = `
+          <div class="catalog-group">
+            <div class="empty-state">
+              <h3>Все разделы исключены</h3>
+              <p>Включите хотя бы один раздел в панели фильтров, чтобы увидеть список заданий.</p>
+              <button class="btn-next" onclick="applyFilterPreset('all')">Включить все разделы</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      if (filteredCards.length === 0) {
+        container.innerHTML = `
+          <div class="catalog-group">
+            <div class="empty-state">
+              <h3>Ничего не найдено</h3>
+              <p>По запросу «${appState.searchQuery}» в выбранных разделах заданий нет.</p>
+              <button class="btn-next" onclick="clearCatalogSearch()">Сбросить поиск</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      enabledCategories.forEach(cat => {
+        const items = filteredCards.filter(c => c.categoryId === cat.id);
+        if (items.length === 0) return;
+
+        const itemsHtml = items.map(item => {
+          const isOpen = appState.expandedItemIds.has(item.id);
+          const timerBtnHtml = item.fitnessConfig ? `
+            <button class="btn-item-timer" onclick="openTimerForExercise('${item.fitnessConfig.mode}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="13" r="8"></circle>
+                <path d="M12 9v4l2 2"></path>
+              </svg>
+              <span>Таймер 1:00</span>
+            </button>
+          ` : '';
+
+          return `
+            <div class="catalog-item">
+              <div class="catalog-item-top">
+                <div class="catalog-item-info">
+                  <div class="catalog-item-question">${item.question}</div>
+                </div>
+                <div class="catalog-item-actions">
+                  ${timerBtnHtml}
+                  <button id="cat_btn_${item.id}" class="btn-item-answer ${isOpen ? 'open' : ''}" onclick="toggleCatalogItemAnswer('${item.id}')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span>${isOpen ? 'Скрыть ответ' : 'Показать ответ'}</span>
+                  </button>
+                </div>
+              </div>
+              <div id="cat_ans_${item.id}" class="catalog-item-answer ${isOpen ? 'visible' : ''}">${item.answer}</div>
+            </div>
+          `;
+        }).join('');
+
+        html += `
+          <section class="catalog-group animate-in">
+            <div class="catalog-group-header">
+              <div>
+                <span class="category-badge ${cat.badgeType}">${cat.shortTitle}</span>
+                <h3 class="catalog-group-title">${cat.fullTitle}</h3>
+              </div>
+              <span class="cat-count">${items.length}</span>
+            </div>
+            <div class="catalog-items">
+              ${itemsHtml}
+            </div>
+          </section>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    /**
+     * =========================================================================
+     * 6. МОДАЛЬНОЕ ОКНО БЫСТРОГО ТАЙМЕРА ОФП
+     * =========================================================================
+     */
+    const MODAL_EXERCISES = {
+      press: { mode: 'press', label: 'Пресс', normReps: 40, defaultSec: 60, altSec: null },
+      pushups: { mode: 'pushups', label: 'Отжимания', normReps: 30, defaultSec: 60, altSec: null },
+      plank: { mode: 'plank', label: 'Стойка на кулаке / одной руке', normReps: null, defaultSec: 60, altSec: 150 }
+    };
+
+    function openQuickTimerModal() {
+      if (cardTimer) cardTimer.pause();
+      document.getElementById('quickTimerModal').classList.add('open');
+
+      if (!modalTimer) {
+        modalTimer = new FitnessTimer('modalTimerMount', MODAL_EXERCISES.press);
+      }
+      currentTimerRef = modalTimer;
+      modalTimer.render();
+    }
+
+    function closeQuickTimerModal() {
+      document.getElementById('quickTimerModal').classList.remove('open');
+      if (modalTimer) modalTimer.stop();
+      if (cardTimer) {
+        currentTimerRef = cardTimer;
+      }
+    }
+
+    function handleModalBackdropClick(e) {
+      if (e.target.id === 'quickTimerModal') {
+        closeQuickTimerModal();
+      }
+    }
+
+    function selectModalExercise(key, btnEl) {
+      document.querySelectorAll('.ex-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+
+      if (modalTimer) modalTimer.stop();
+      modalTimer = new FitnessTimer('modalTimerMount', MODAL_EXERCISES[key]);
+      currentTimerRef = modalTimer;
+      modalTimer.render();
+    }
+
+    /**
+     * =========================================================================
+     * 7. ГОРЯЧИЕ КЛАВИШИ И СТАРТ ПРИЛОЖЕНИЯ
+     * =========================================================================
+     */
+    document.addEventListener('keydown', (e) => {
+      // Не перехватываем клавиши, если пользователь печатает число повторений в input
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        return;
+      }
+
+      const modalOpen = document.getElementById('quickTimerModal').classList.contains('open');
+      if (modalOpen) {
+        if (e.key === 'Escape') closeQuickTimerModal();
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleAnswer();
+      } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        e.preventDefault();
+        drawNextCard();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderCategoryFilters();
+      drawNextCard();
+      renderCatalogList();
+    });
+  </script>
 </body>
 </html>
